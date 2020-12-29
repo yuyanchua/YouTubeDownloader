@@ -43,6 +43,14 @@ def menu():
     return sel
 
 
+def prompt_caption():
+    sel = input('Download caption? [y/n]? ').rstrip('\r')
+    if sel.lower() == 'y':
+        return True
+    else:
+        return False
+
+
 def menu_download_by_url():
     print('Youtube link')
     link = input("Input: ").rstrip('\r')
@@ -61,13 +69,27 @@ def menu_download_by_url():
             print('Cancel download')
             return
 
-        # vd.download_video(stream_queries=queries, itag=itag)
+        download_caption = prompt_caption()
+        caption_code = None
+        while download_caption:
+            caption_code = vd.print_caption()
+            if caption_code == 'x':
+                print('Cancel download caption')
+                break
+            elif caption_code is None:
+                continue
+            else:
+                vd.download_caption(caption_code)
+                break
+
+        vd.download_video(stream_queries=queries, itag=itag)
 
     except:
         print('Invalid link')
         traceback.print_exc()
         return
         # pass
+
 
 def main():
     # setup folder

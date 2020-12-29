@@ -60,6 +60,30 @@ def print_query(queries):
     return itag
 
 
+def print_caption(yt):
+    caption_list = yt.caption_tracks
+    print('Caption'.center(54, ' '))
+    print('|' + 'Number'.center(10, ' ') +
+          '|' + 'Code'.center(10, ' ') +
+          '|' + 'Language'.center(30, ' ') + '|')
+    print('|' + ''.ljust(10, '-') +
+          '|' + ''.ljust(10, '-') +
+          '|' + ''.ljust(30, '-') + '|')
+
+    for i in range(len(caption_list)):
+        caption = caption_list[i]
+        print('|' + f'{i}'.center(10, ' ') +
+              '|' + f'{caption.code}'.center(10, ' ') +
+              '|' + f'{caption.name}'.center(30, ' ') + '|')
+
+
+def prompt_caption():
+    sel = input('Download caption? [y/n]? ').rstrip('\r')
+    if sel.lower() == 'y':
+        return True
+    else:
+        return False
+
 try:
     tube = YouTube(link)
 
@@ -71,8 +95,12 @@ try:
     stream = streamQuery.filter(progressive=False, file_extension='mp4')
     stream_itag = print_query(stream)
 
+    download_caption = prompt_caption()
+    if download_caption:
+        print_caption(tube)
+
     stream_query = stream.get_by_itag(stream_itag)
-    stream_query.download(output_path=SAVE_PATH)
+    #stream_query.download(output_path=SAVE_PATH)
     # stream.download(output_path=SAVE_PATH)
     # stream.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first().download()
 except:

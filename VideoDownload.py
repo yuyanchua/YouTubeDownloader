@@ -122,7 +122,7 @@ class VideoDownloader(object):
         sel = input('Select [default = 1]: ').rstrip('\r')
         if sel == '':
             sel = '1'
-        elif sel == 'x':
+        elif sel.lower() == 'x':
             itag = 'x'
             return itag
 
@@ -139,7 +139,45 @@ class VideoDownloader(object):
         return itag
 
     def print_caption(self):
-        pass
+        caption_list = self.tube.caption_tracks
+        print('Caption'.center(54, ' '))
+        print('|' + 'Number'.center(10, ' ') +
+              '|' + 'Code'.center(10, ' ') +
+              '|' + 'Language'.center(30, ' ') + '|')
+        print('|' + ''.ljust(10, '-') +
+              '|' + ''.ljust(10, '-') +
+              '|' + ''.ljust(30, '-') + '|')
+
+        for i in range(1, len(caption_list)):
+            caption = caption_list[i]
+            print('|' + f'{i}'.center(10, ' ') +
+                  '|' + f'{caption.code}'.center(10, ' ') +
+                  '|' + f'{caption.name}'.center(30, ' ') + '|')
+
+        print('x to cancel download caption')
+        sel = input('Select (default = 1): ')
+        if sel.lower() == 'x':
+            return 'x'
+
+        if sel == '':
+            sel = 1
+
+        try:
+            sel = int(sel)
+
+            if 0 < sel < len(caption_list):
+                return caption_list[sel].code
+            else:
+                return None
+        except:
+            return None
+
+    def download_caption(self, caption_code):
+        caption_query = self.tube.captions
+        caption = caption_query[caption_code]
+        title = self.stream_queries.first().title
+        if caption:
+            caption.download(title=title, output_path=self.save_path['video'])
 
     # def print_stream(self, stream_queries=None):
     #     if not stream_queries:
@@ -203,7 +241,7 @@ class VideoDownloader(object):
             self.download_audio(stream=stream, save_dir='audio')
         elif stream.type == 'video':
 
-            print(stream)
+            # print(stream)
             output_path = self.save_path['video']
 
             video_name = f'video_{query_name}'
