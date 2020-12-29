@@ -1,4 +1,4 @@
-from YouTubeDownloader.VideoDownload import VideoDownloader
+from VideoDownload import VideoDownloader
 from pathlib import Path
 import os
 import sys
@@ -28,17 +28,17 @@ def setup():
 
 
 def header():
-    print(f'YouTube Downloader v {0.1}')
+    print(f'\nYouTube Downloader v {0.1}')
 
 
 def menu():
-    print('Menu')
+    print('\nMenu')
     print('1. Download video by url')
     print('2. Download video by playlist')
     print(''.ljust(50, '-'))
     print('x. Exit Program')
     # sel = 0
-    sel = input('Input: ').rstrip('\r')
+    sel = input('\nInput: ').rstrip('\r')
     # sel = '1'
     return sel
 
@@ -113,4 +113,7 @@ def main():
 
 
 if __name__ == '__main__':
+    print('Startup')
+    input('Press any key to start').rstrip('\r')
+
     main()

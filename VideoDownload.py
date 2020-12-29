@@ -6,7 +6,7 @@ import subprocess
 
 
 def combine_audio_video(video, audio, codec, output):
-    subprocess.run(f'ffmpeg -i "{video}" -i "{audio}" -c {codec} "{output}"')
+    subprocess.run(f'./bin/ffmpeg -i "{video}" -i "{audio}" -c {codec} "{output}"')
 
     os.remove(video)
     os.remove(audio)
@@ -205,7 +205,7 @@ class VideoDownloader(object):
         stream.download(output_path=output_dir)
 
         print('Converting to mp3')
-        subprocess.run(f'ffmpeg -i "{mp4_file}" "{mp3_file}"')
+        subprocess.run(f'./bin/ffmpeg -i "{mp4_file}" "{mp3_file}"')
         os.remove(mp4_file)
 
     def download_video(self, stream_queries, itag=None):
