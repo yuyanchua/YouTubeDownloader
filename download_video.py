@@ -4,7 +4,7 @@ import traceback
 
 SAVE_PATH = Path.cwd()
 
-link = 'https://www.youtube.com/watch?v=K2PET09OMzc'
+link = 'https://www.youtube.com/watch?v=te_nocX0gi4'
 
 size_prefix = ['bytes', 'KB', 'MB']
 

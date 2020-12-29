@@ -7,8 +7,7 @@ import subprocess
 
 def combine_audio_video(video, audio, codec, output):
     subprocess.run(f'ffmpeg -i "{video}" -i "{audio}" -c {codec} "{output}"')
-    print(video)
-    print(audio)
+
     os.remove(video)
     os.remove(audio)
 
@@ -22,18 +21,29 @@ def convert_byte(size):
     return f'{size:.3f} {size_prefix[div]}'
 
 
+def clear_invalid(title):
+    invalid_char = ['/', '\\', ':', '?', '*', '"', '|', '<', '>', '#']
+
+    for char in invalid_char:
+        title = title.replace(char, '')
+
+    return title
+
+
 class VideoDownloader(object):
 
     def __init__(self, link, save_path):
-        try:
-            self.link = link
-            self.tube = YouTube(link, on_progress_callback=on_progress)
-            self.stream_queries = self.tube.streams
-            self.save_path = save_path
+        # try:
+        self.link = link
+        self.tube = YouTube(link, on_progress_callback=on_progress)
+        self.tube.check_availability()
+        self.stream_queries = self.tube.streams
+        self.video_title = clear_invalid(self.stream_queries.first().title)
+        self.save_path = save_path
 
-        except:
-            print('Invalid link')
-            traceback.print_exc()
+        # except:
+        #     print('Invalid link')
+        #     # traceback.print_exc()
 
     def limit_query(self):
         temp_queries = []
@@ -74,7 +84,7 @@ class VideoDownloader(object):
         audio_query = stream_queries.get_audio_only('mp4')
 
         index = 1
-        print(stream_queries.first().title)
+        print(self.video_title)
         print('Video'.center(76, ' '))
         print('|' + 'Number'.center(10, ' ') + "|" +
               'Resolution'.center(20, ' ') + '|' +
@@ -98,22 +108,38 @@ class VideoDownloader(object):
               'Filetype'.center(20, ' ') + '|' +
               'Codec'.center(20, ' ') + '|' +
               'FileSize'.center(20, ' ') + '|')
-        print('|' + ''.ljust(10, '-') + '|' + ''.ljust(20, '-') + '|' + ''.ljust(20, '-') + '|' + ''.ljust(20, '-') + '|')
+        print('|' + ''.ljust(10, '-') + '|' +
+              ''.ljust(20, '-') + '|' +
+              ''.ljust(20, '-') + '|' +
+              ''.ljust(20, '-') + '|')
 
         print('|' + str(index).center(10, ' ') + '|' +
               f'.mp3({audio_query.abr})'.center(20, ' ') + '|' +
               f'{audio_query.audio_codec}'.center(20, ' ') + '|' +
               convert_byte(audio_query.filesize).center(20, ' ') + '|')
 
-        sel = int(input('Select: ').rstrip('\r'))
+        print('x to cancel download')
+        sel = input('Select [default = 1]: ').rstrip('\r')
+        if sel == '':
+            sel = '1'
+        elif sel == 'x':
+            itag = 'x'
+            return itag
 
+        sel = int(sel)
         if sel == index:
             itag = audio_query.itag
-        else:
+        elif 0 < sel < index:
             query = video_query[sel - 1]
             itag = query.itag
+        else:
+            itag = None
+            print('Invalid input')
 
         return itag
+
+    def print_caption(self):
+        pass
 
     # def print_stream(self, stream_queries=None):
     #     if not stream_queries:
@@ -129,15 +155,15 @@ class VideoDownloader(object):
 
     def download_audio(self, stream, save_dir):
         output_dir = self.save_path[save_dir]
-        mp4_file = output_dir / (stream.title + '.mp4')
-        mp3_file = output_dir / (stream.title + '.mp3')
+        mp4_file = output_dir / (self.video_title + '.mp4')
+        mp3_file = output_dir / (self.video_title + '.mp3')
 
         index = 1
         while os.path.exists(mp3_file):
-            mp3_file = output_dir / (stream.title + f'_{index}.mp3')
+            mp3_file = output_dir / (self.video_title + f'_{index}.mp3')
             index += 1
 
-        print(f'Downloading {stream.title}.mp4')
+        print(f'Downloading {self.video_title}.mp4')
         stream.download(output_path=output_dir)
 
         print('Converting to mp3')
@@ -152,7 +178,7 @@ class VideoDownloader(object):
 
         print(stream_queries.first().default_filename)
         print(stream_queries.first().subtype)
-        query_name = stream_queries.first().title
+        query_name = self.video_title
 
         # sort by highest resolution
         # check if the result query is progressive
@@ -205,18 +231,3 @@ class VideoDownloader(object):
             else:
                 print(f'Downloading {query_name}.mp4')
                 stream.download(output_path=output_path, filename=f'{query_name}')
-
-        # for query in self.stream_queries:
-        #     if query.type == 'video':
-        #         output_path = save_path['video']
-        #         filename = f'{query_name}_{query.resolution}'
-        #     else:
-        #         output_path = save_path['audio']
-        #         filename = f'{query_name}_{query.abr}'
-        #
-        #     print(filename)
-        #     if os.path.exists(output_path / f'{filename}.{query.subtype}'):
-        #         print('Is Exist')
-        #         continue
-
-        #    query.download(output_path=output_path, filename=filename)
