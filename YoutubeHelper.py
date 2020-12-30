@@ -26,3 +26,10 @@ def clear_invalid(title):
 
     return title
 
+
+def prompt_open_file_location(save_path):
+    print('Do you want to open the file location?')
+    key = input('Enter: [y/n]').rstrip('\r')
+    if key.lower() == 'y':
+        print(f'Opening {save_path} ...')
+        subprocess.run(f'explorer {save_path}')

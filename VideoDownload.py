@@ -52,6 +52,10 @@ class VideoDownloader(object):
 
         return self.stream_queries
 
+    def print_video_info(self):
+        print(self.video_title)
+        print(self.tube.description)
+
     def print_stream(self, stream_queries=None):
         if not stream_queries:
             stream_queries = self.stream_queries
@@ -167,22 +171,24 @@ class VideoDownloader(object):
     #                 continue
     #         print(query)
 
-    def download_audio(self, stream, save_dir):
-        output_dir = self.save_path[save_dir]
-        mp4_file = output_dir / (self.video_title + '.mp4')
-        mp3_file = output_dir / (self.video_title + '.mp3')
+    def download_audio(self, stream, save_type):
+        output_path = self.save_path[save_type]
+        mp4_file = output_path / (self.video_title + '.mp4')
+        mp3_file = output_path / (self.video_title + '.mp3')
 
         index = 1
         while os.path.exists(mp3_file):
-            mp3_file = output_dir / (self.video_title + f'_{index}.mp3')
+            mp3_file = output_path / (self.video_title + f'_{index}.mp3')
             index += 1
 
         print(f'Downloading {self.video_title}.mp4')
-        stream.download(output_path=output_dir)
+        stream.download(output_path=output_path)
 
         print('Converting to mp3')
         subprocess.run(f'./bin/ffmpeg -i "{mp4_file}" "{mp3_file}"')
         os.remove(mp4_file)
+
+        prompt_open_file_location(output_path)
 
     def download_video(self, stream_queries, itag=None):
         if stream_queries is None:
@@ -214,7 +220,7 @@ class VideoDownloader(object):
                     break
 
         if stream.type == 'audio':
-            self.download_audio(stream=stream, save_dir='audio')
+            self.download_audio(stream=stream, save_type='audio')
         elif stream.type == 'video':
 
             # print(stream)
@@ -245,3 +251,5 @@ class VideoDownloader(object):
             else:
                 print(f'Downloading {query_name}.mp4')
                 stream.download(output_path=output_path, filename=f'{query_name}')
+
+            prompt_open_file_location(save_path=output_path)
