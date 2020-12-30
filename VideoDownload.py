@@ -118,6 +118,18 @@ class VideoDownloader(object):
 
         return itag
 
+    def prompt_caption(self):
+        caption_num = len(self.tube.caption_tracks)
+        if caption_num <= 0:
+            print('Caption is unavailable')
+            return
+
+        sel = input('Download caption? [y/n]? ').rstrip('\r')
+        if sel.lower() == 'y':
+            return True
+        else:
+            return False
+
     def print_caption(self):
         caption_list = self.tube.caption_tracks
         print('Caption'.center(54, ' '))
