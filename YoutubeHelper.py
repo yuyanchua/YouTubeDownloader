@@ -9,6 +9,19 @@ def combine_audio_video(video, audio, codec, output):
     os.remove(audio)
 
 
+def convert_to_mp3(mp4_file, mp3_file):
+    print('Converting to mp3')
+    subprocess.run(f'./bin/ffmpeg -i "{mp4_file}" "{mp3_file}"')
+    os.remove(mp4_file)
+
+
+def get_file_name(file_path, file_name, file_type):
+    index = 1
+    output_name = file_path / f'{file_name}.{file_type}'
+    while os.path.exists(output_name):
+        output_name = file_path / f'{file_name}_{index}.{file_type}'
+        index += 1
+
 def convert_byte(size):
     size_prefix = ['Bytes', 'KB', 'MB', 'GB']
     div = 0

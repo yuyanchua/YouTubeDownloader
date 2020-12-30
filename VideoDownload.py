@@ -9,17 +9,12 @@ import subprocess
 class VideoDownloader(object):
 
     def __init__(self, link, save_path):
-        # try:
         self.link = link
         self.tube = YouTube(link, on_progress_callback=on_progress)
         self.tube.check_availability()
         self.stream_queries = self.tube.streams
         self.video_title = clear_invalid(self.stream_queries.first().title)
         self.save_path = save_path
-
-        # except:
-        #     print('Invalid link')
-        #     # traceback.print_exc()
 
     def limit_query(self):
         temp_queries = []
@@ -164,14 +159,29 @@ class VideoDownloader(object):
         except:
             return None
 
-    def download_caption(self, caption_code):
+    def get_caption_index(self):
+        caption_index = None
+        while True:
+            caption_index = self.print_caption()
+            if caption_index == 'x':
+                print('Cancel download caption')
+                break
+            elif caption_index is None:
+                continue
+            else:
+                # self.download_caption(caption_code)
+                break
+
+        return caption_index
+
+    def download_caption(self, caption_index):
         caption_query = self.tube.captions
-        caption = caption_query[caption_code]
+        caption = caption_query[caption_index]
         title = self.stream_queries.first().title
         if caption:
             caption.download(title=title, output_path=self.save_path['video'])
 
-    # def print_stream(self, stream_queries=None):
+    # def print_stream(self, stream_queries=No  ne):
     #     if not stream_queries:
     #         stream_queries = self.stream_queries
     #
@@ -186,19 +196,22 @@ class VideoDownloader(object):
     def download_audio(self, stream, save_type):
         output_path = self.save_path[save_type]
         mp4_file = output_path / (self.video_title + '.mp4')
-        mp3_file = output_path / (self.video_title + '.mp3')
 
-        index = 1
-        while os.path.exists(mp3_file):
-            mp3_file = output_path / (self.video_title + f'_{index}.mp3')
-            index += 1
+        mp3_file = get_file_name(output_path, self.video_title, 'mp3')
+        # mp3_file = output_path / (self.video_title + '.mp3')
+
+        # index = 1
+        # while os.path.exists(mp3_file):
+        #     mp3_file = output_path / (self.video_title + f'_{index}.mp3')
+        #     index += 1
 
         print(f'Downloading {self.video_title}.mp4')
         stream.download(output_path=output_path)
 
-        print('Converting to mp3')
-        subprocess.run(f'./bin/ffmpeg -i "{mp4_file}" "{mp3_file}"')
-        os.remove(mp4_file)
+        convert_to_mp3(mp4_file=mp4_file, mp3_file=mp3_file)
+        # print('Converting to mp3')
+        # subprocess.run(f'./bin/ffmpeg -i "{mp4_file}" "{mp3_file}"')
+        # os.remove(mp4_file)
 
         prompt_open_file_location(output_path)
 
@@ -249,11 +262,13 @@ class VideoDownloader(object):
                 audio_query = stream_queries.filter(type='audio').first()
                 audio_query.download(output_path=output_path, filename=audio_name)
 
-                index = 1
-                output_name = output_path / f'{query_name}.mp4'
-                while os.path.exists(output_name):
-                    output_name = output_path / f'{query_name}_{index}.mp4'
-                    index += 1
+                # index = 1
+                # output_name = output_path / f'{query_name}.mp4'
+                # while os.path.exists(output_name):
+                #     output_name = output_path / f'{query_name}_{index}.mp4'
+                #     index += 1
+
+                output_name = get_file_name(output_path, query_name, 'mp4')
 
                 combine_audio_video(output_path / (video_name + '.mp4'),
                                     output_path / (audio_name + '.mp4'),
