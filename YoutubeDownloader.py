@@ -1,4 +1,5 @@
-from VideoDownload import VideoDownloader
+from YouTubeDownloader.VideoDownload import VideoDownloader
+from YouTubeDownloader.PlaylistDownload import PlaylistDownloader
 from pathlib import Path
 import os
 import sys
@@ -11,6 +12,7 @@ save_path = {
         'video' : video_output_path,
         'audio' : audio_output_path
     }
+playlist_link = 'https://www.youtube.com/playlist?list=PLcu4K20DxziwSPFIhvLWwNCCMCith86_S'
 
 
 def setup():
@@ -89,6 +91,15 @@ def menu_download_by_url():
         traceback.print_exc()
         return
         # pass
+
+
+def menu_download_by_playlist():
+    print('Youtube Playlist Link')
+    link = input('Input: ').rstrip('\r')
+    try:
+        pd = PlaylistDownloader(link)
+    except:
+        traceback.print_exc()
 
 
 def main():
