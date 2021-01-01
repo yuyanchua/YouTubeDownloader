@@ -1,6 +1,7 @@
 from pathlib import Path
 from pytube import YouTube
 import traceback
+from YouTubeDownloader.YoutubeHelper import *
 
 SAVE_PATH = Path.cwd()
 
@@ -85,28 +86,30 @@ def prompt_caption():
         return False
 
 
-while True:
-    try:
-        print('Youtube Link')
-        link = input('Link: ').rstrip('\r')
-        tube = YouTube(link)
+# while True:
+try:
+    print('Youtube Link')
+    link = input('Link: ').rstrip('\r')
+    tube = YouTube(link)
 
-        tube.check_availability()
+    tube.check_availability()
 
-        streamQuery = tube.streams
+    streamQuery = tube.streams
 
-        # stream = streamQuery.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
-        stream = streamQuery.filter(progressive=False, file_extension='mp4')
-        stream_itag = print_query(stream)
+    # stream = streamQuery.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
+    stream = streamQuery.filter(progressive=False, file_extension='mp4')
+    stream_itag = print_query(stream)
 
-        download_caption = prompt_caption()
-        if download_caption:
-            print_caption(tube)
+    download_caption = prompt_caption()
+    if download_caption:
+        print_caption(tube)
 
-        stream_query = stream.get_by_itag(stream_itag)
+    stream_query = stream.get_by_itag(stream_itag)
 
-        stream_query.download(output_path=SAVE_PATH)
-        # stream.download(output_path=SAVE_PATH)
-        # stream.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first().download()
-    except:
-        traceback.print_exc()
+    # stream_query.download(output_path=SAVE_PATH)
+    # prompt_open_file_location(SAVE_PATH)
+
+    # stream.download(output_path=SAVE_PATH)
+    # stream.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first().download()
+except:
+    traceback.print_exc()

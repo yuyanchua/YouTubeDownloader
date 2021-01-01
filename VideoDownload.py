@@ -104,14 +104,17 @@ class VideoDownloader(object):
         sel = int(sel)
         if sel == index:
             itag = audio_query.itag
+            type = 'audio'
         elif 0 < sel < index:
             query = video_query[sel - 1]
             itag = query.itag
+            type = 'video'
         else:
             itag = None
+            type = None
             print('Invalid input')
 
-        return itag
+        return itag, type
 
     def prompt_caption(self):
         caption_num = len(self.tube.caption_tracks)

@@ -22,6 +22,9 @@ def get_file_name(file_path, file_name, file_type):
         output_name = file_path / f'{file_name}_{index}.{file_type}'
         index += 1
 
+    return output_name
+
+
 def convert_byte(size):
     size_prefix = ['Bytes', 'KB', 'MB', 'GB']
     div = 0
@@ -32,8 +35,9 @@ def convert_byte(size):
 
 
 def clear_invalid(title):
-    invalid_char = ['/', '\\', ':', '?', '*', '"', '|', '<', '>', '#']
-
+    invalid_char = ['/', '\\', ':', '?', '*', '"',
+                    '|', '<', '>', '#', '.', ',',
+                    '$', '\'', '~']
     for char in invalid_char:
         title = title.replace(char, '')
 
